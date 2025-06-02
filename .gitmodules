@@ -1,0 +1,6 @@
+[submodule "unigo-backend"]
+	path = unigo-backend
+	url = https://github.com/JenifferFerraz/unigo-backend.git
+[submodule "unigo-frontend"]
+	path = unigo-frontend
+	url = https://github.com/JenifferFerraz/unigo-frontend.git
