@@ -31,6 +31,30 @@ git submodule update --init --recursive
 docker-compose up -d
 ```
 
+### Configuração do Flutter SDK
+
+O Flutter **não é mais utilizado como submódulo**. Para configurar o ambiente do frontend, siga os passos abaixo:
+
+1. Baixe ou clone o SDK do Flutter na pasta `unigo-frontend/flutter`:
+```bash
+git clone https://github.com/flutter/flutter.git -b stable unigo-frontend/flutter
+```
+
+2. Adicione o Flutter ao seu PATH (recomendado):
+   - No Windows, adicione `C:\Users\<seu-usuario>\Desktop\unigo-project\unigo-frontend\flutter\bin` ao PATH do sistema.
+   - No Linux/Mac, adicione ao seu `.bashrc` ou `.zshrc`:
+     ```bash
+     export PATH="$(pwd)/unigo-frontend/flutter/bin:$PATH"
+     ```
+
+3. Verifique a instalação:
+```bash
+cd unigo-frontend
+./flutter/bin/flutter doctor
+```
+
+4. Instale o Android Studio e configure o SDK do Android, se desejar desenvolver para Android.
+
 ## Desenvolvimento
 
 Para trabalhar com os submódulos:
