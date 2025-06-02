@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # Serviço do Backend (Node.js Express)
+  backend_app: # Nome do serviço 
+    container_name: unigo-api # Nome do contêiner Docker
+    build:
+      context: ./unigo-backend # O Dockerfile do backend está na pasta 'backend'
+      dockerfile: Dockerfile # O nome do Dockerfile
+      args: # Argumentos passados para o Dockerfile durante o build
+        DK_UID: ${DK_UID}
+        DK_GID: ${DK_GID}
+    volumes:
+      # Mapeia o código fonte do host (pasta 'backend') para o contêiner
+      # Isso permite hot-reloading em desenvolvimento sem reconstruir a imagem
+      - ./unigo-backend:/home/node/project
+    command: ["npm", "run", "dev"] # Comando para iniciar a aplicação em modo de desenvolvimento
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT_EXPOSE}" # Mapeamento de portas: <PORTA_HOST>:<PORTA_CONTÊINER>
+    environment:
+      NODE_ENV: development
+      DEBUG: nodejs-docker-express:*
+    networks:
+      - unigo-network # Conecta este serviço à rede 'unigo-network'
+    depends_on:
+      - db # Garante que o serviço 'db' (PostgreSQL) inicie antes do backend
+
+# Serviço do Frontend (Flutter Web)
+  frontend_app:
+    container_name: unigo-web # Nome do contêiner
+    build:
+      context: ./unigo-frontend # O Dockerfile do frontend está na pasta 'unigo-frontend'
+      dockerfile: Dockerfile # Nome do Dockerfile
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT_EXPOSE}" # Mapeamento de portas (host:container)
+    # Para desenvolvimento com Flutter Web e hot-reload, você pode querer mapear volumes.
+    # No entanto, Flutter Web hot-reload é mais complexo com Docker.
+    # A abordagem de build e servir Nginx é mais comum para produção ou builds estáticos.
+    # Se você quiser live-reload, é melhor rodar o Flutter Dev Server DIRETAMENTE no host.
+    volumes:
+      - ./unigo-frontend:/app # Mapeia o código fonte para dentro do contêiner (se o Dockerfile copiar)
+      - /app/node_modules # Se tiver node_modules no Flutter para build
+    working_dir: /app
+    networks:
+      - unigo-network
+    depends_on:
+      - backend_app # Opcional: Se o frontend precisa do backend para iniciar
+    command: ["nginx", "-g", "daemon off;"] # Comando padrão para servir uma SPA com Nginx
+
+
+  # Serviço do Banco de Dados (PostgreSQL)
+  db: # Nome do serviço do banco de dados
+    image: postgres:15-alpine
+    container_name: unigo-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - unigo-network
+
+
+# Definição das redes
+networks:
+  unigo-network:
+    name: unigo-network # Nome explícito da rede
+    driver: bridge # Tipo de rede (padrão para comunicação entre contêineres)
+
+volumes:
+  postgres_data:
