@@ -46,7 +46,7 @@ services:
       - unigo-network
     depends_on:
       - backend_app # Opcional: Se o frontend precisa do backend para iniciar
-    command: ["nginx", "-g", "daemon off;"] # Comando padrão para servir uma SPA com Nginx
+    command: ["flutter", "run", "-d", "web-server", "--web-port=${FRONTEND_PORT_EXPOSE}", "--host=0.0.0.0"]
 
 
   # Serviço do Banco de Dados (PostgreSQL)
