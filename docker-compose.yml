@@ -14,6 +14,7 @@ services:
       # Mapeia o código fonte do host (pasta 'backend') para o contêiner
       # Isso permite hot-reloading em desenvolvimento sem reconstruir a imagem
       - ./unigo-backend:/home/node/project
+      - /home/node/project/node_modules
     command: ["npm", "run", "dev"] # Comando para iniciar a aplicação em modo de desenvolvimento
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT_EXPOSE}" # Mapeamento de portas: <PORTA_HOST>:<PORTA_CONTÊINER>
