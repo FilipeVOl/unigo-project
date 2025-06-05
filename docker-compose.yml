@@ -27,26 +27,25 @@ services:
       - db # Garante que o serviço 'db' (PostgreSQL) inicie antes do backend
 
 # Serviço do Frontend (Flutter Web)
-  frontend_app:
-    container_name: unigo-web # Nome do contêiner
-    build:
-      context: ./unigo-frontend # O Dockerfile do frontend está na pasta 'unigo-frontend'
-      dockerfile: Dockerfile # Nome do Dockerfile
-    ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT_EXPOSE}" # Mapeamento de portas (host:container)
-    # Para desenvolvimento com Flutter Web e hot-reload, você pode querer mapear volumes.
-    # No entanto, Flutter Web hot-reload é mais complexo com Docker.
-    # A abordagem de build e servir Nginx é mais comum para produção ou builds estáticos.
-    # Se você quiser live-reload, é melhor rodar o Flutter Dev Server DIRETAMENTE no host.
-    volumes:
-      - ./unigo-frontend:/app # Mapeia o código fonte para dentro do contêiner (se o Dockerfile copiar)
-      - /app/node_modules # Se tiver node_modules no Flutter para build
-    working_dir: /app
-    networks:
-      - unigo-network
-    depends_on:
-      - backend_app # Opcional: Se o frontend precisa do backend para iniciar
-    command: ["flutter", "run", "-d", "web-server", "--web-port=${FRONTEND_PORT_EXPOSE}", "--host=0.0.0.0"]
+  # frontend_app:
+  #   container_name: unigo-web # Nome do contêiner
+  #   build:
+  #     context: ./unigo-frontend # O Dockerfile do frontend está na pasta 'unigo-frontend'
+  #     dockerfile: Dockerfile # Nome do Dockerfile
+  #   ports:
+  #     - "${FRONTEND_PORT}:${FRONTEND_PORT_EXPOSE}" # Mapeamento de portas (host:container)
+  #   volumes:
+  #     - ./unigo-frontend:/app # Mapeia o código fonte para dentro do contêiner
+  #     - /app/.dart_tool # Evita problemas com cache do Dart
+  #     - /app/build # Evita problemas com build
+  #   working_dir: /app
+  #   networks:
+  #     - unigo-network
+  #   depends_on:
+  #     - backend_app
+  #   environment:
+  #     - FLUTTER_WEB_PORT=${FRONTEND_PORT_EXPOSE}
+  #   command: ["/bin/bash", "-c", "/usr/local/flutter/bin/flutter run -d web-server --web-port=${FRONTEND_PORT_EXPOSE} --web-hostname=0.0.0.0"]
 
 
   # Serviço do Banco de Dados (PostgreSQL)
